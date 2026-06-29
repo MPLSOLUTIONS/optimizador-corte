@@ -121,7 +121,7 @@
             letter-spacing: 1px;
         }
 
-        input[type="number"] {
+        input[type="number"], input[type="text"] {
             width: 100%;
             padding: 10px 12px;
             background: var(--bg);
@@ -134,7 +134,8 @@
             transition: border-color 0.2s;
         }
 
-        input[type="number"]:focus { outline: none; border-color: var(--accent); }
+        input[type="number"]:focus,
+        input[type="text"]:focus { outline: none; border-color: var(--accent); }
 
         .row { display: flex; gap: 10px; }
         .row > div { flex: 1; }
@@ -168,8 +169,22 @@
         }
         .btn-danger:not(:disabled):hover { background: var(--danger); color: white; }
 
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--muted);
+            margin-top: 8px;
+        }
+        .btn-outline:not(:disabled):hover { border-color: var(--accent); color: var(--accent); }
+
+        .btn-sm {
+            width: auto;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+
         .pieces-list {
-            max-height: 260px;
+            max-height: 300px;
             overflow-y: auto;
             margin-bottom: 12px;
             display: flex;
@@ -191,9 +206,16 @@
             border-radius: 6px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 13px;
+            gap: 6px;
         }
 
-        .piece-row-info { display: flex; gap: 10px; align-items: center; }
+        .piece-row.editing {
+            border-color: var(--accent);
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .piece-row-info { display: flex; gap: 8px; align-items: center; flex: 1; min-width: 0; }
 
         .piece-tag {
             display: inline-block;
@@ -202,17 +224,41 @@
             flex-shrink: 0;
         }
 
-        .remove-btn {
+        .piece-name {
+            color: var(--text);
+            font-weight: 600;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .piece-dims {
+            color: var(--muted);
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        .piece-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+        .icon-btn {
             background: none;
             border: none;
             color: var(--muted);
             cursor: pointer;
-            font-size: 16px;
-            padding: 2px 4px;
+            font-size: 14px;
+            padding: 3px 5px;
             border-radius: 3px;
             transition: color 0.2s, background 0.2s;
+            line-height: 1;
         }
-        .remove-btn:hover { color: var(--danger); background: rgba(240,80,96,0.12); }
+        .icon-btn:hover { color: var(--accent); background: rgba(240,192,64,0.1); }
+        .icon-btn.danger:hover { color: var(--danger); background: rgba(240,80,96,0.12); }
+
+        .edit-form { display: flex; flex-direction: column; gap: 8px; }
+        .edit-form input { margin-bottom: 0; font-size: 13px; padding: 7px 10px; }
+        .edit-form .row { gap: 6px; }
+        .edit-form-actions { display: flex; gap: 6px; }
+        .edit-form-actions .btn { margin-top: 0; padding: 7px; font-size: 12px; }
 
         .empty-msg {
             text-align: center;
@@ -229,6 +275,43 @@
             text-align: right;
             padding: 4px 0 10px;
         }
+
+        /* PROJECTS */
+        .projects-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 160px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 7px 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            gap: 6px;
+        }
+
+        .project-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .project-date { color: var(--muted); font-size: 10px; white-space: nowrap; }
+
+        .autosave-indicator {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--muted);
+            text-align: right;
+            margin-top: 6px;
+            height: 14px;
+            transition: color 0.3s;
+        }
+        .autosave-indicator.saved { color: var(--accent2); }
 
         /* RESULTS */
         .results-area { display: flex; flex-direction: column; gap: 16px; }
@@ -285,6 +368,19 @@
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+
+        .export-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-bar .btn {
+            width: auto;
+            padding: 9px 16px;
+            font-size: 13px;
+            margin-top: 0;
         }
 
         .pattern-card {
@@ -387,7 +483,7 @@
             padding: 4px 0;
         }
 
-        /* LOADING OVERLAY */
+        /* LOADING */
         .loading-state {
             background: var(--surface);
             border: 1px solid var(--border);
@@ -455,9 +551,41 @@
             line-height: 2;
         }
         .placeholder-icon { font-size: 2.5em; margin-bottom: 10px; }
+
+        /* TOAST */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--surface);
+            border: 1px solid var(--accent2);
+            color: var(--accent2);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            z-index: 999;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.25s;
+            pointer-events: none;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.error { border-color: var(--danger); color: var(--danger); }
+
+        @media print {
+            .sidebar, .header .solver-badge, .export-bar, #btnOptimize, #btnClear { display: none !important; }
+            .layout { grid-template-columns: 1fr; }
+            body { background: white; color: black; padding: 0; }
+            .card, .pattern-card, .stat { border-color: #ccc; background: white; }
+            .stat-value { color: #111; }
+            .bar-wrap { border: 1px solid #ccc; }
+        }
     </style>
 </head>
 <body>
+
+<div class="toast" id="toast"></div>
 
 <div class="header">
     <h1>✦ Corte 1D</h1>
@@ -481,6 +609,8 @@
 
         <div class="card">
             <div class="card-title">✚ Agregar pieza</div>
+            <label>Nombre / etiqueta</label>
+            <input type="text" id="pieceName" placeholder="ej: viga principal">
             <div class="row">
                 <div>
                     <label>Largo (mm)</label>
@@ -502,13 +632,32 @@
             <button class="btn btn-danger" id="btnClear" onclick="clearAll()">✕ Limpiar todo</button>
         </div>
 
+        <div class="card">
+            <div class="card-title">💾 Proyectos</div>
+            <label>Nombre del proyecto</label>
+            <input type="text" id="projectName" placeholder="Mi proyecto">
+            <div class="row">
+                <button class="btn btn-accent btn-sm" style="margin-top:0" onclick="saveProject()">Guardar</button>
+                <button class="btn btn-outline btn-sm" style="margin-top:0" onclick="exportProjectJSON()">Exportar JSON</button>
+            </div>
+            <div style="margin-top:10px; position:relative;">
+                <label style="display:flex;align-items:center;justify-content:space-between;">
+                    Proyectos guardados
+                    <input type="file" id="importFile" accept=".json" style="display:none" onchange="importProjectJSON(event)">
+                    <span onclick="document.getElementById('importFile').click()" style="cursor:pointer;color:var(--info);font-size:10px;">↑ Importar JSON</span>
+                </label>
+            </div>
+            <div class="projects-list" id="projectsList"></div>
+            <div class="autosave-indicator" id="autosaveIndicator"></div>
+        </div>
+
     </div>
 
     <div class="results-area" id="resultsArea">
         <div class="placeholder">
             <div class="placeholder-icon">📐</div>
             Cargando solver Python…<br>
-            <span style="font-size:0.85em;opacity:0.6">Pyodide + PuLP + CBC se están iniciando.</span>
+            <span style="font-size:0.85em;opacity:0.6">Pyodide + scipy.optimize.milp se están iniciando.</span>
         </div>
     </div>
 </div>
@@ -526,12 +675,26 @@ const COLORS = [
     '#c0a040','#6040f0','#f07040','#40c0a0','#a040b0'
 ];
 
+// pieces: { length, quantity, name }
 let pieces = [];
 let pyodide = null;
 let solverReady = false;
+let lastResultData = null;  // para exportar
 
 // ─────────────────────────────────────────────────────────────────────────────
-// INICIALIZAR PYODIDE + PuLP
+// TOAST
+// ─────────────────────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg, isError = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (isError ? ' error' : '');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = 'toast'; }, 2800);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INICIALIZAR PYODIDE
 // ─────────────────────────────────────────────────────────────────────────────
 const logs = [];
 function appendLog(msg, cls = '') {
@@ -598,7 +761,7 @@ assert int(round(res.x[0])) == 1
 
         solverReady = true;
         setBadge('ready', 'scipy MILP listo — óptimo garantizado');
-        document.getElementById('btnOptimize').disabled = false;
+        document.getElementById('btnOptimize').disabled = pieces.length === 0;
 
         document.getElementById('resultsArea').innerHTML = `
             <div class="placeholder">
@@ -612,7 +775,7 @@ assert int(round(res.x[0])) == 1
         appendLog('Error: ' + err.message, 'err');
         setBadge('error', 'Pyodide no disponible — usando fallback JS');
         solverReady = false;
-        document.getElementById('btnOptimize').disabled = false;
+        document.getElementById('btnOptimize').disabled = pieces.length === 0;
         document.getElementById('resultsArea').innerHTML = `
             <div class="placeholder">
                 <div class="placeholder-icon">⚠️</div>
@@ -623,91 +786,366 @@ assert int(round(res.x[0])) == 1
     }
 }
 
-// Iniciar en background
-initSolver();
-
 // ─────────────────────────────────────────────────────────────────────────────
 // MANEJO DE PIEZAS
 // ─────────────────────────────────────────────────────────────────────────────
-[
-    { length: 1500, quantity: 4 },
-    { length: 900,  quantity: 6 },
-    { length: 650,  quantity: 5 },
-    { length: 480,  quantity: 8 },
-    { length: 320,  quantity: 10 },
-    { length: 200,  quantity: 7 },
-].forEach(p => pieces.push({ ...p }));
-
-renderPiecesList();
-
 function addPiece() {
+    const name     = document.getElementById('pieceName').value.trim();
     const length   = parseFloat(document.getElementById('pieceLength').value);
     const quantity = parseInt(document.getElementById('pieceQty').value);
     const barLen   = parseFloat(document.getElementById('barLength').value);
 
-    if (!length || length <= 0)    return alert('Ingresa un largo válido.');
-    if (!quantity || quantity < 1) return alert('Ingresa una cantidad válida.');
-    if (length >= barLen)          return alert('La pieza no puede ser mayor o igual al largo de la barra.');
+    if (!length || length <= 0)    return showToast('Ingresa un largo válido.', true);
+    if (!quantity || quantity < 1) return showToast('Ingresa una cantidad válida.', true);
+    if (length >= barLen)          return showToast('La pieza no puede ser mayor o igual al largo de la barra.', true);
 
-    const existing = pieces.find(p => p.length === length);
-    if (existing) existing.quantity += quantity;
-    else pieces.push({ length, quantity });
+    const existing = pieces.find(p => p.length === length && p.name === name);
+    if (existing) {
+        existing.quantity += quantity;
+    } else {
+        pieces.push({ length, quantity, name: name || `${length} mm` });
+    }
 
+    document.getElementById('pieceName').value   = '';
     document.getElementById('pieceLength').value = '';
     document.getElementById('pieceQty').value    = '1';
     renderPiecesList();
+    autoSave();
 }
 
 function removePiece(index) {
     pieces.splice(index, 1);
     renderPiecesList();
+    autoSave();
 }
 
 function clearAll() {
     if (!confirm('¿Limpiar todas las piezas y resultados?')) return;
     pieces = [];
+    lastResultData = null;
     renderPiecesList();
     document.getElementById('resultsArea').innerHTML = `
         <div class="placeholder">
             <div class="placeholder-icon">📐</div>
             Agrega piezas y presiona <strong>Optimizar cortes</strong>.
         </div>`;
+    autoSave();
+}
+
+// Edit in-place
+function startEdit(index) {
+    const p = pieces[index];
+    const row = document.querySelector(`.piece-row[data-index="${index}"]`);
+    if (!row) return;
+    row.classList.add('editing');
+    row.innerHTML = `
+        <div class="edit-form">
+            <input type="text" id="edit-name-${index}" value="${escHtml(p.name)}" placeholder="Nombre">
+            <div class="row">
+                <div><input type="number" id="edit-len-${index}" value="${p.length}" min="1" placeholder="Largo mm"></div>
+                <div><input type="number" id="edit-qty-${index}" value="${p.quantity}" min="1" placeholder="Cantidad"></div>
+            </div>
+            <div class="edit-form-actions">
+                <button class="btn btn-accent" style="flex:1" onclick="saveEdit(${index})">✓ Guardar</button>
+                <button class="btn btn-outline" style="flex:1" onclick="renderPiecesList()">✕ Cancelar</button>
+            </div>
+        </div>`;
+    document.getElementById(`edit-name-${index}`).focus();
+}
+
+function saveEdit(index) {
+    const name   = document.getElementById(`edit-name-${index}`).value.trim();
+    const length = parseFloat(document.getElementById(`edit-len-${index}`).value);
+    const qty    = parseInt(document.getElementById(`edit-qty-${index}`).value);
+    const barLen = parseFloat(document.getElementById('barLength').value);
+
+    if (!length || length <= 0)  return showToast('Largo inválido.', true);
+    if (!qty || qty < 1)         return showToast('Cantidad inválida.', true);
+    if (length >= barLen)        return showToast('La pieza no puede ser mayor o igual al largo de la barra.', true);
+
+    pieces[index] = { length, quantity: qty, name: name || `${length} mm` };
+    renderPiecesList();
+    autoSave();
+    showToast('Pieza actualizada.');
 }
 
 function renderPiecesList() {
     const list   = document.getElementById('piecesList');
     const footer = document.getElementById('piecesFooter');
+    const btn    = document.getElementById('btnOptimize');
 
     if (pieces.length === 0) {
         list.innerHTML   = '<div class="empty-msg">Sin piezas — agrega alguna.</div>';
         footer.innerHTML = '';
+        btn.disabled     = true;
         return;
     }
 
     list.innerHTML = pieces.map((p, i) => `
-        <div class="piece-row">
+        <div class="piece-row" data-index="${i}">
             <div class="piece-row-info">
                 <span class="piece-tag" style="background:${COLORS[i % COLORS.length]}"></span>
-                <span>${p.length} mm &times; ${p.quantity}</span>
+                <div style="min-width:0">
+                    <div class="piece-name">${escHtml(p.name)}</div>
+                    <div class="piece-dims">${p.length} mm &times; ${p.quantity}</div>
+                </div>
             </div>
-            <button class="remove-btn" onclick="removePiece(${i})" title="Eliminar">&#x2715;</button>
+            <div class="piece-actions">
+                <button class="icon-btn" onclick="startEdit(${i})" title="Editar">✎</button>
+                <button class="icon-btn danger" onclick="removePiece(${i})" title="Eliminar">✕</button>
+            </div>
         </div>
     `).join('');
 
     const total = pieces.reduce((s, p) => s + p.quantity, 0);
     footer.innerHTML = `${pieces.length} tipo${pieces.length !== 1 ? 's' : ''} &mdash; ${total} piezas en total`;
+    btn.disabled = false;
+}
+
+function escHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// PROYECTOS — localStorage
+// ─────────────────────────────────────────────────────────────────────────────
+const LS_KEY      = 'corte1d_projects';
+const LS_AUTOSAVE = 'corte1d_autosave';
+
+function getProjects() {
+    try { return JSON.parse(localStorage.getItem(LS_KEY) || '{}'); }
+    catch { return {}; }
+}
+
+function saveProject() {
+    const name = document.getElementById('projectName').value.trim();
+    if (!name) return showToast('Escribe un nombre para el proyecto.', true);
+    if (pieces.length === 0) return showToast('Agrega piezas antes de guardar.', true);
+
+    const projects = getProjects();
+    projects[name] = {
+        pieces: JSON.parse(JSON.stringify(pieces)),
+        barLength: document.getElementById('barLength').value,
+        cutWidth:  document.getElementById('cutWidth').value,
+        savedAt:   new Date().toISOString()
+    };
+    localStorage.setItem(LS_KEY, JSON.stringify(projects));
+    renderProjectsList();
+    showToast(`Proyecto "${name}" guardado.`);
+}
+
+function loadProject(name) {
+    const projects = getProjects();
+    const proj = projects[name];
+    if (!proj) return;
+
+    pieces = JSON.parse(JSON.stringify(proj.pieces));
+    document.getElementById('barLength').value = proj.barLength;
+    document.getElementById('cutWidth').value  = proj.cutWidth;
+    document.getElementById('projectName').value = name;
+    renderPiecesList();
+    lastResultData = null;
+    document.getElementById('resultsArea').innerHTML = `
+        <div class="placeholder">
+            <div class="placeholder-icon">📂</div>
+            Proyecto <strong>${escHtml(name)}</strong> cargado.<br>
+            Presiona <strong>Optimizar cortes</strong> para calcular.
+        </div>`;
+    showToast(`Proyecto "${name}" cargado.`);
+}
+
+function deleteProject(name) {
+    if (!confirm(`¿Eliminar proyecto "${name}"?`)) return;
+    const projects = getProjects();
+    delete projects[name];
+    localStorage.setItem(LS_KEY, JSON.stringify(projects));
+    renderProjectsList();
+    showToast(`Proyecto "${name}" eliminado.`);
+}
+
+function renderProjectsList() {
+    const container = document.getElementById('projectsList');
+    const projects  = getProjects();
+    const names     = Object.keys(projects);
+
+    if (names.length === 0) {
+        container.innerHTML = '<div class="empty-msg" style="padding:10px">Sin proyectos guardados.</div>';
+        return;
+    }
+
+    container.innerHTML = names.map(n => {
+        const date = new Date(projects[n].savedAt).toLocaleDateString('es-CL');
+        return `<div class="project-item">
+            <span class="project-name">${escHtml(n)}</span>
+            <span class="project-date">${date}</span>
+            <div class="piece-actions">
+                <button class="icon-btn" onclick="loadProject('${escHtml(n)}')" title="Cargar">↓</button>
+                <button class="icon-btn danger" onclick="deleteProject('${escHtml(n)}')" title="Eliminar">✕</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// Autosave del estado actual (sin nombre)
+let autoSaveTimer = null;
+function autoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        try {
+            localStorage.setItem(LS_AUTOSAVE, JSON.stringify({
+                pieces,
+                barLength: document.getElementById('barLength').value,
+                cutWidth:  document.getElementById('cutWidth').value,
+            }));
+            const ind = document.getElementById('autosaveIndicator');
+            ind.textContent = '● guardado automáticamente';
+            ind.className = 'autosave-indicator saved';
+            setTimeout(() => {
+                ind.textContent = '';
+                ind.className = 'autosave-indicator';
+            }, 2000);
+        } catch {}
+    }, 800);
+}
+
+function loadAutosave() {
+    try {
+        const data = JSON.parse(localStorage.getItem(LS_AUTOSAVE) || 'null');
+        if (data && data.pieces && data.pieces.length > 0) {
+            pieces = data.pieces;
+            document.getElementById('barLength').value = data.barLength || 3200;
+            document.getElementById('cutWidth').value  = data.cutWidth  || 3;
+            renderPiecesList();
+            return true;
+        }
+    } catch {}
+    return false;
+}
+
+function exportProjectJSON() {
+    if (pieces.length === 0) return showToast('Agrega piezas antes de exportar.', true);
+    const name = document.getElementById('projectName').value.trim() || 'proyecto-corte';
+    const data = {
+        name,
+        pieces,
+        barLength: document.getElementById('barLength').value,
+        cutWidth:  document.getElementById('cutWidth').value,
+        exportedAt: new Date().toISOString()
+    };
+    downloadFile(`${name}.json`, JSON.stringify(data, null, 2), 'application/json');
+    showToast('Proyecto exportado como JSON.');
+}
+
+function importProjectJSON(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const data = JSON.parse(e.target.result);
+            if (!data.pieces || !Array.isArray(data.pieces)) throw new Error('Formato inválido');
+            pieces = data.pieces;
+            document.getElementById('barLength').value = data.barLength || 3200;
+            document.getElementById('cutWidth').value  = data.cutWidth  || 3;
+            if (data.name) document.getElementById('projectName').value = data.name;
+            renderPiecesList();
+            autoSave();
+            showToast('Proyecto importado correctamente.');
+        } catch (err) {
+            showToast('Error al importar: ' + err.message, true);
+        }
+    };
+    reader.readAsText(file);
+    event.target.value = '';
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EXPORTAR RESULTADOS
+// ─────────────────────────────────────────────────────────────────────────────
+function exportCSV() {
+    if (!lastResultData) return showToast('Primero optimiza los cortes.', true);
+    const { patterns, barLen, cutW } = lastResultData;
+
+    const rows = [['Patron', 'Barras', 'Pieza', 'Largo_mm', 'Cantidad_en_barra', 'Desperdicio_mm']];
+    patterns.forEach((pat, pi) => {
+        const used  = pat.bar.reduce((s, p) => s + p.length + cutW, 0);
+        const waste = Math.max(0, barLen - used);
+        const counts = {};
+        pat.bar.forEach(p => {
+            const key = `${p.colorIndex}|${p.length}`;
+            if (!counts[key]) counts[key] = { length: p.length, colorIndex: p.colorIndex, count: 0 };
+            counts[key].count++;
+        });
+        Object.values(counts).forEach(c => {
+            const name = pieces[c.colorIndex] ? pieces[c.colorIndex].name : `${c.length} mm`;
+            rows.push([pi + 1, pat.count, escCsv(name), c.length, c.count, Math.round(waste)]);
+        });
+    });
+
+    const csv = rows.map(r => r.join(';')).join('\n');
+    downloadFile('plan-corte.csv', csv, 'text/csv;charset=utf-8;');
+    showToast('CSV exportado.');
+}
+
+function escCsv(str) {
+    return `"${String(str).replace(/"/g, '""')}"`;
+}
+
+function copyResultsText() {
+    if (!lastResultData) return showToast('Primero optimiza los cortes.', true);
+    const { patterns, totalBars, barLen, cutW, efficiency, wastePercent } = lastResultData;
+
+    let text = `PLAN DE CORTE — ${new Date().toLocaleDateString('es-CL')}\n`;
+    text += `Barra: ${barLen} mm | Eficiencia: ${efficiency}% | Desperdicio: ${wastePercent}%\n`;
+    text += `Total barras: ${totalBars}\n\n`;
+
+    patterns.forEach((pat, pi) => {
+        const used  = pat.bar.reduce((s, p) => s + p.length + cutW, 0);
+        const waste = Math.max(0, barLen - used);
+        text += `Patrón ${pi + 1} × ${pat.count} barra${pat.count !== 1 ? 's' : ''} (desperdicio ${Math.round(waste)} mm)\n`;
+        const counts = {};
+        pat.bar.forEach(p => {
+            const key = pieces[p.colorIndex] ? pieces[p.colorIndex].name : `${p.length} mm`;
+            counts[key] = (counts[key] || 0) + 1;
+        });
+        Object.entries(counts).forEach(([name, n]) => {
+            text += `  · ${name}${n > 1 ? ' × ' + n : ''}\n`;
+        });
+        text += '\n';
+    });
+
+    navigator.clipboard.writeText(text)
+        .then(() => showToast('Resultados copiados al portapapeles.'))
+        .catch(() => showToast('No se pudo copiar.', true));
+}
+
+function printResults() {
+    window.print();
+}
+
+function downloadFile(filename, content, type) {
+    const blob = new Blob([content], { type });
+    const url  = URL.createObjectURL(blob);
+    const a    = document.createElement('a');
+    a.href     = url;
+    a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
 // OPTIMIZAR
 // ─────────────────────────────────────────────────────────────────────────────
 async function optimize() {
-    if (pieces.length === 0) return alert('Agrega al menos una pieza.');
+    if (pieces.length === 0) return showToast('Agrega al menos una pieza.', true);
 
     const barLen = parseFloat(document.getElementById('barLength').value);
-    const cutW   = parseFloat(document.getElementById('cutWidth').value);
+    const cutW   = parseFloat(document.getElementById('cutWidth').value) || 0;
 
-    // Deshabilitar botón durante cálculo
     const btn = document.getElementById('btnOptimize');
     btn.disabled = true;
     btn.textContent = '⏳ Calculando…';
@@ -715,7 +1153,7 @@ async function optimize() {
     document.getElementById('resultsArea').innerHTML = `
         <div class="loading-state">
             <div class="loading-title">🧮 Resolviendo ILP…</div>
-            <div class="loading-sub">CBC buscando solución óptima garantizada</div>
+            <div class="loading-sub">HiGHS buscando solución óptima garantizada</div>
             <div class="progress-bar-wrap">
                 <div class="progress-bar-fill" id="progressFill" style="width:30%;animation: grow 3s ease forwards;"></div>
             </div>
@@ -735,7 +1173,7 @@ async function optimize() {
         document.getElementById('resultsArea').innerHTML = `
             <div class="placeholder">
                 <div class="placeholder-icon">❌</div>
-                Error al resolver: ${err.message}
+                Error al resolver: ${escHtml(err.message)}
             </div>`;
     } finally {
         btn.disabled = false;
@@ -744,7 +1182,7 @@ async function optimize() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SOLVER PYTHON — scipy.optimize.milp (nativo, sin procesos externos)
+// SOLVER PYTHON — scipy.optimize.milp
 // ─────────────────────────────────────────────────────────────────────────────
 async function solveWithPython(barLen, cutW) {
     const lengths = pieces.map(p => p.length);
@@ -762,11 +1200,9 @@ demands  = ${JSON.stringify(demands)}
 n_types  = len(lengths)
 slots    = [l + cut_w for l in lengths]
 
-# ── PASO 1: Generar todos los patrones válidos ──────────────────────────────
-# Patrón = vector [c0..cn], ci = cuántas piezas tipo i en una barra
 MAX_PATTERNS = 50000
-pat_counts = []   # lista de listas de conteos
-pat_waste  = []   # desperdicio de cada patrón
+pat_counts = []
+pat_waste  = []
 
 def gen(type_idx, remaining, current):
     if len(pat_counts) >= MAX_PATTERNS:
@@ -785,24 +1221,14 @@ def gen(type_idx, remaining, current):
 gen(0, bar_len, [0] * n_types)
 n_pats = len(pat_counts)
 
-# ── PASO 2: MILP con scipy ─────────────────────────────────────────────────
-# Variables: x[j] >= 0 enteras, = veces que se usa patrón j
-# Objetivo: minimizar sum(x[j])               → c = [1, 1, ..., 1]
-# Restricciones: A @ x >= demands             → cobertura de demanda
-# donde A[i,j] = pat_counts[j][i]
-
 t0 = time.time()
-
-# Vector de costos (1 barra por patrón)
 c_obj = np.ones(n_pats)
-
-# Matriz de restricciones: shape (n_types, n_pats)
-A = np.array(pat_counts, dtype=float).T   # (n_types, n_pats)
+A = np.array(pat_counts, dtype=float).T
 b_lb = np.array(demands, dtype=float)
 b_ub = np.full(n_types, np.inf)
 
 constraints = LinearConstraint(A, lb=b_lb, ub=b_ub)
-integrality = np.ones(n_pats)             # todas enteras
+integrality = np.ones(n_pats)
 bounds = Bounds(lb=0.0, ub=np.inf)
 
 res = milp(
@@ -814,9 +1240,8 @@ res = milp(
 )
 
 solve_time = round(time.time() - t0, 2)
-is_optimal = res.status == 0  # 0 = óptimo encontrado
+is_optimal = res.status == 0
 
-# ── PASO 3: Extraer solución ────────────────────────────────────────────────
 solution_patterns = []
 if res.x is not None:
     for j in range(n_pats):
@@ -827,9 +1252,6 @@ if res.x is not None:
                 "waste":  pat_waste[j],
                 "count":  count
             })
-else:
-    # Si milp no encontró solución, devolver vacío y JS hará fallback
-    solution_patterns = []
 
 total_bars = sum(p["count"] for p in solution_patterns)
 
@@ -872,14 +1294,10 @@ json.dumps(result)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// SOLVER JS FALLBACK (FFD + B&B)
+// SOLVER JS FALLBACK (FFD)
 // ─────────────────────────────────────────────────────────────────────────────
 function solveWithJS(barLen, cutW) {
     const types = pieces.map((p, i) => ({ length: p.length, demand: p.quantity, colorIndex: i }));
-    const N = types.length;
-    const slot = i => types[i].length + cutW;
-
-    // FFD
     const all = [];
     types.forEach((t, ti) => {
         for (let i = 0; i < t.demand; i++) all.push({ length: t.length, ti });
@@ -901,7 +1319,6 @@ function solveWithJS(barLen, cutW) {
         else ffdBars.push([piece]);
     });
 
-    // Agrupar barras idénticas FFD
     const sigs = new Map();
     ffdBars.forEach(bar => {
         bar.sort((a, b) => b.length - a.length);
@@ -917,7 +1334,7 @@ function solveWithJS(barLen, cutW) {
         patterns:  Array.from(sigs.values()),
         totalBars: ffdBars.length,
         isOptimal: false,
-        solverInfo: 'JS fallback (FFD + B&B) — Pyodide no disponible'
+        solverInfo: 'JS fallback (FFD) — Pyodide no disponible'
     };
 }
 
@@ -938,18 +1355,28 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
     const efficiency   = ((totalUsed / (totalBars * barLen)) * 100).toFixed(1);
     const wastePercent = ((totalWaste / (totalBars * barLen)) * 100).toFixed(1);
 
+    // Guardar para exportar
+    lastResultData = { patterns, totalBars, barLen, cutW, efficiency, wastePercent, isOptimal, solverInfo };
+
     let html = '';
 
-    // Banner óptimo o fallback
+    // Banner
     if (isOptimal) {
         html += `<div class="optimal-banner">
-            ✅ &nbsp;<strong>Solución óptima garantizada</strong> — ${solverInfo}
+            ✅ &nbsp;<strong>Solución óptima garantizada</strong> — ${escHtml(solverInfo)}
         </div>`;
     } else {
         html += `<div class="fallback-banner">
-            ⚠️ &nbsp;<strong>Solución heurística</strong> — ${solverInfo}
+            ⚠️ &nbsp;<strong>Solución heurística</strong> — ${escHtml(solverInfo)}
         </div>`;
     }
+
+    // Export bar
+    html += `<div class="export-bar">
+        <button class="btn btn-outline" onclick="exportCSV()">📥 Exportar CSV</button>
+        <button class="btn btn-outline" onclick="copyResultsText()">📋 Copiar texto</button>
+        <button class="btn btn-outline" onclick="printResults()">🖨 Imprimir</button>
+    </div>`;
 
     // Stats
     html += `<div class="stats-grid">
@@ -961,14 +1388,14 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
         <div class="stat"><div class="stat-label">Desper. total</div><div class="stat-value small">${Math.round(totalWaste)} mm</div></div>
     </div>`;
 
-    // Leyenda
+    // Leyenda con nombres
     html += `<div class="card">
         <div class="card-title">🎨 Referencias</div>
         <div class="legend-row">`;
     pieces.forEach((p, i) => {
         html += `<div class="legend-item">
             <div class="legend-dot" style="background:${COLORS[i % COLORS.length]}"></div>
-            ${p.length} mm
+            <span>${escHtml(p.name)} <span style="color:var(--muted)">(${p.length} mm)</span></span>
         </div>`;
     });
     html += `<div class="legend-item">
@@ -982,8 +1409,8 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
     patterns.sort((a, b) => b.count - a.count);
 
     patterns.forEach((pat, pi) => {
-        const used    = pat.bar.reduce((s, p) => s + p.length + cutW, 0);
-        const waste   = Math.max(0, barLen - used);
+        const used     = pat.bar.reduce((s, p) => s + p.length + cutW, 0);
+        const waste    = Math.max(0, barLen - used);
         const wastePct = ((waste / barLen) * 100).toFixed(1);
 
         html += `<div class="pattern-card">
@@ -998,7 +1425,8 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
         pat.bar.forEach(p => {
             const wPct  = (p.length / barLen * 100).toFixed(3);
             const color = COLORS[p.colorIndex % COLORS.length];
-            html += `<div class="seg" style="width:${wPct}%;background:${color};" title="${p.length} mm">${p.length}</div>`;
+            const label = pieces[p.colorIndex] ? pieces[p.colorIndex].name : `${p.length}`;
+            html += `<div class="seg" style="width:${wPct}%;background:${color};" title="${escHtml(label)} — ${p.length} mm">${p.length}</div>`;
         });
 
         if (waste > 0.5) {
@@ -1008,7 +1436,7 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
 
         html += `</div>`;
 
-        // Desglose
+        // Desglose con nombres
         const countMap = {};
         pat.bar.forEach(p => {
             const key = `${p.length}_${p.colorIndex}`;
@@ -1018,9 +1446,10 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
 
         html += `<div class="piece-breakdown">`;
         Object.values(countMap).forEach(c => {
+            const name = pieces[c.colorIndex] ? pieces[c.colorIndex].name : `${c.length} mm`;
             html += `<div class="pb-item">
                 <div class="pb-dot" style="background:${COLORS[c.colorIndex % COLORS.length]}"></div>
-                ${c.length} mm${c.count > 1 ? ' &times; ' + c.count : ''}
+                ${escHtml(name)}${c.count > 1 ? ' &times; ' + c.count : ''}
             </div>`;
         });
         html += `</div></div>`;
@@ -1031,13 +1460,41 @@ function renderResults(patterns, totalBars, barLen, cutW, isOptimal, solverInfo)
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// AUTOSAVE en cambios de parámetros
+// ─────────────────────────────────────────────────────────────────────────────
+['barLength', 'cutWidth'].forEach(id => {
+    document.getElementById(id).addEventListener('input', autoSave);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
 // TECLADO
 // ─────────────────────────────────────────────────────────────────────────────
-['pieceLength','pieceQty'].forEach(id => {
+['pieceName', 'pieceLength', 'pieceQty'].forEach(id => {
     document.getElementById(id).addEventListener('keydown', e => {
         if (e.key === 'Enter') addPiece();
     });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INICIALIZAR
+// ─────────────────────────────────────────────────────────────────────────────
+const hadAutosave = loadAutosave();
+
+if (!hadAutosave) {
+    // Ejemplo precargado con nombres
+    [
+        { length: 1500, quantity: 4, name: 'Viga principal' },
+        { length: 900,  quantity: 6, name: 'Viga secundaria' },
+        { length: 650,  quantity: 5, name: 'Travesaño largo' },
+        { length: 480,  quantity: 8, name: 'Travesaño corto' },
+        { length: 320,  quantity: 10, name: 'Larguero' },
+        { length: 200,  quantity: 7,  name: 'Refuerzo' },
+    ].forEach(p => pieces.push({ ...p }));
+    renderPiecesList();
+}
+
+renderProjectsList();
+initSolver();
 </script>
 
 </body>
